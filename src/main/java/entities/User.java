@@ -1,8 +1,10 @@
 package entities;
 
+import interfaces.Observer;
+
 import javax.naming.OperationNotSupportedException;
 
-public class User {
+public class User implements Observer {
 
     private String firstName;
     private String lastName;
@@ -19,7 +21,7 @@ public class User {
         this.userName = userName;
         this.isActive = true;
         this.currentChannel = DefaultChannel.getInstance();
-        currentChannel.addSubscriber(this);
+        currentChannel.attach(this);
     }
 
     public String getFirstName() {
@@ -56,8 +58,8 @@ public class User {
 
     public void sendPrivateMessage(String contents, User recipient) {
         Channel channel = new Channel(recipient.getUserName());
-        channel.addSubscriber(this);
-        channel.addSubscriber(recipient);
+        channel.attach(this);
+        channel.attach(recipient);
         currentChannel = channel;
         postInChannel(contents);
     }
@@ -66,7 +68,7 @@ public class User {
         Message message = new Message(contents);
         message.setSender(this);
         currentChannel.addMessage(message);
-        currentChannel.alertAll();
+        currentChannel.alert();
         System.out.println("ran");
     }
 
@@ -77,22 +79,22 @@ public class User {
 
     public void createChannel(String name, User... users) {
         Channel channel = new Channel(name);
-        channel.addSubscriber(this);
+        channel.attach(this);
         for (User user : users) {
-            channel.addSubscriber(user);
+            channel.attach(user);
         }
         channel.setCreator(this);
         currentChannel = channel;
     }
 
     public void unsubscribe(Channel channel) {
-        channel.removeSubscriber(this);
+        channel.detach(this);
     }
 
     public void addUser(Channel channel, User... users) throws OperationNotSupportedException {
         if (channel.getCreator() == this) {
             for (User user: users) {
-                channel.addSubscriber(user);
+                channel.attach(user);
             }
         } else {
             throw new OperationNotSupportedException("Only a channel administrator can add users");
@@ -102,7 +104,7 @@ public class User {
     public void removeUser(Channel channel, User... users) throws OperationNotSupportedException {
         if (channel.getCreator() == this) {
             for (User user: users) {
-                channel.removeSubscriber(user);
+                channel.detach(user);
             }
         } else {
             throw new OperationNotSupportedException("Only a channel administrator can remove users");
@@ -125,7 +127,8 @@ public class User {
         }
     }
 
-    public void alert(Channel channel) {
+    public void update(Object o) {
+        Channel channel = (Channel)o;
         if (currentChannel != channel) {
             System.out.println(userName + ": there are new messages in " + channel.getName());
             // this will ultimately get replaced with something else

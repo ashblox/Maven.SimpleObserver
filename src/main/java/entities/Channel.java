@@ -1,12 +1,15 @@
 package entities;
 
+import interfaces.Observer;
+import interfaces.Subject;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Channel {
-
+public class Channel implements Subject {
+    
     private String name;
-    private List<User> subscribers;
+    private List<Observer> observers;
     private List<Message> messages;
     private User creator;
 
@@ -15,7 +18,7 @@ public class Channel {
 
     public Channel(String name) {
         this.name = name;
-        this.subscribers = new ArrayList<User>();
+        this.observers = new ArrayList<Observer>();
         this.messages = new ArrayList<Message>();
     }
 
@@ -27,12 +30,12 @@ public class Channel {
         this.name = name;
     }
 
-    public List<User> getSubscribers() {
-        return subscribers;
+    public List<Observer> getObservers() {
+        return observers;
     }
 
-    public void setSubscribers(List<User> subscribers) {
-        this.subscribers = subscribers;
+    public void setObservers(List<Observer> observers) {
+        this.observers = observers;
     }
 
     public List<Message> getMessages() {
@@ -51,12 +54,12 @@ public class Channel {
         messages.remove(message);
     }
 
-    public void addSubscriber(User user) {
-        subscribers.add(user);
+    public void attach(Observer observer) {
+        observers.add(observer);
     }
 
-    public void removeSubscriber(User user) {
-        subscribers.remove(user);
+    public void detach(Observer observer) {
+        observers.remove(observer);
     }
 
     public User getCreator() {
@@ -67,9 +70,9 @@ public class Channel {
         this.creator = creator;
     }
 
-    public void alertAll() {
-        for (User user: subscribers) {
-            user.alert(this);
+    public void alert() {
+        for (Observer observer: observers) {
+            observer.update(this);
         }
     }
 

@@ -9,5 +9,8 @@
         <module name="Maven.SimpleObserver" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Maven.SimpleObserver" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
