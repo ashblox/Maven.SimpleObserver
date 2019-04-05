@@ -57,7 +57,9 @@ public class User implements Observer {
     }
 
     public void sendPrivateMessage(String contents, User recipient) {
-        Channel channel = new Channel(recipient.getUserName());
+        // ideally the creator would see the channels name as the recipient and the recipient would see
+        // the channel's name as the sender; not sure how to implement this
+        Channel channel = new Channel(userName + " & " + recipient.getUserName());
         channel.attach(this);
         channel.attach(recipient);
         currentChannel = channel;
